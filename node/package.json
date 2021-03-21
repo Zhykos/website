@@ -2,7 +2,7 @@
   "name": "node",
   "version": "1.0.0",
   "description": "",
-  "main": "gallery-sheet2div.js",
+  "main": "gallery-generator.js",
   "dependencies": {
     "googleapis": "^68.0.0"
   },
