@@ -1,3 +1,7 @@
 /.project
 .settings
 /assets/img/portfolio/portfolio
+/node/node_modules
+/node/credentials.json
+/node/package-lock.json
+/node/token.json
