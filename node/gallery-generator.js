@@ -76,18 +76,24 @@ function printPage(rows) {
 }
 
 function printOneGame(columnsStr) {
-    return `
-                <div class="col-md-6 col-lg-4 item zoom-on-hover">
-                    <a class="lightbox"
-                        href="${columnsStr[4]}">
-                        <img class="img-fluid image"
-                            src="assets/img/gallery/${getImageName(columnsStr[0])}.jpg" />
-                        <span class="description">
-                            <span class="description-heading">${columnsStr[0]}</span>
-                            <span class="description-body">${columnsStr[1]} - ${columnsStr[2]} - ${columnsStr[3]}</span>
-                        </span>
-                    </a>
-                </div>`;
+    const htmlImg = `assets/img/gallery/${getImageName(columnsStr[0])}.jpg`;
+    if (fs.existsSync("../" + htmlImg)) {
+        return `
+        <div class="col-md-6 col-lg-4 item zoom-on-hover">
+            <a class="lightbox"
+                href="${columnsStr[4]}">
+                <img class="img-fluid image"
+                    src="${htmlImg}" />
+                <span class="description">
+                    <span class="description-heading">${columnsStr[0]}</span>
+                    <span class="description-body">${columnsStr[1]} - ${columnsStr[2]} - ${columnsStr[3]}</span>
+                </span>
+            </a>
+        </div>`;
+    } else {
+        console.error(`Image miniature n'existe pas : ${htmlImg}`);
+        return "";
+    }
 }
 
 function getImageName(gameName) {
