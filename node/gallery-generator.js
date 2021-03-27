@@ -97,7 +97,7 @@ function printOneGame(columnsStr) {
 }
 
 function getImageName(gameName) {
-    return gameName.replace(/[^a-zA-Z0-9]/g, '-').replace(/-+/g, '-').replace(/-$/, '');
+    return gameName.replace(/[^a-zA-Z0-9]/g, '-').replace(/-+/g, '-').replace(/-$/, '').replace("-early-access", '').replace("-alpha", '');
 }
 
 /**
