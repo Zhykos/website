@@ -36,7 +36,7 @@ function printPage(rows) {
 
 <body>
     <section class="gallery-block compact-gallery">
-        <div class="container">
+        <div class="main">
             <div class="heading">
                 <img class="img-fluid image" src="assets/img/gallery/logo.png" style="height: 100px;" />
                 <h2>Video Game Gallery by Zhykos.fr</h2>
@@ -79,7 +79,7 @@ function printOneGame(columnsStr) {
     const htmlImg = `assets/img/gallery/${getImageName(columnsStr[0])}.jpg`;
     if (fs.existsSync("../" + htmlImg)) {
         return `
-        <div class="col-md-6 col-lg-4 item zoom-on-hover">
+        <div class="col-md-6 col-lg-3 item zoom-on-hover">
             <a class="lightbox"
                 href="${columnsStr[4]}">
                 <img class="img-fluid image"
