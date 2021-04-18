@@ -19,7 +19,7 @@ fs.readFile('credentials.json', (err, content) => {
 });
 
 
-function printPage(rowsScreenshots, rowsEvents) {
+function printPage(rowsScreenshots, rowsEvents, rowsPressKits) {
     var page = `<!DOCTYPE html>
 <html>
 
@@ -44,7 +44,7 @@ function printPage(rowsScreenshots, rowsEvents) {
                     href="https://docs.google.com/spreadsheets/d/1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU/edit?usp=sharing">Google
                     Sheet</a><br />
                 Go back to main website: <a href="./index.html">Zhykos.fr</a><br /><br />
-                Links index: <a href="#screenshots">Screenshots</a> / <a href="#events">Events</a>
+                Links index: <a href="#screenshots">Screenshots</a> / <a href="#events">Events</a> / <a href="#presskits">Press kits</a>
             </div>
             <div class="heading">
                 <h3><a id="screenshots"></a>Thomas "Zhykos"'screenshots</h3>
@@ -63,6 +63,16 @@ function printPage(rowsScreenshots, rowsEvents) {
             <div class="row no-gutters">`;
     rowsEvents.map((row) => {
         page += printImageDiv(row, "events");
+    });
+    page += `
+            </div>
+            <div class="heading" style="padding-top: 50px;">
+                <h3><a id="presskits"></a>Press kits</h3>
+                ${rowsPressKits.length} games
+            </div>
+            <div class="row no-gutters">`;
+    rowsPressKits.map((row) => {
+        page += printImageDiv(row, "presskits");
     });
     page += `
             </div>
@@ -91,8 +101,10 @@ function printImageDiv(columnsData, type) {
         var url;
         if (type == "screenshots") {
             url = columnsData[4];
-        } else {
+        } else if (type == "events") {
             url = columnsData[3];
+        } else {
+            url = columnsData[1];
         }
         var imageDiv = `
         <div class="col-md-6 col-lg-3 item zoom-on-hover">
@@ -104,8 +116,10 @@ function printImageDiv(columnsData, type) {
                     <span class="description-heading">${columnsData[0]}</span>`;
         if (type == "screenshots") {
             imageDiv += `<span class="description-body">${columnsData[1]} - ${columnsData[2]} - ${columnsData[3]}</span>`;
-        } else {
+        } else if (type == "events") {
             imageDiv += `<span class="description-body">${columnsData[1]} - ${columnsData[2]}</span>`;
+        } else {
+            // imageDiv += `<span class="description-body">${columnsData[1]} - ${columnsData[2]}</span>`;
         }
         imageDiv += `</span>
             </a>
@@ -207,7 +221,22 @@ function print(auth) {
                 const rowsEvents = resEvents.data.values;
                 if (rowsEvents.length) {
                     sortArray(rowsEvents);
-                    printPage(rowsScreenshots, rowsEvents);
+
+                    sheets.spreadsheets.values.get({
+                        spreadsheetId: '1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU',
+                        range: 'Press kits!A4:C',
+                    }, (errPressKits, resPressKits) => {
+                        if (errPressKits) {
+                            return console.log('The API returned an error: ' + errPressKits);
+                        }
+                        const rowsPressKits = resPressKits.data.values;
+                        if (rowsPressKits.length) {
+                            sortArray(rowsPressKits);
+                            printPage(rowsScreenshots, rowsEvents, rowsPressKits);
+                        } else {
+                            console.log('Press kits. no data found.');
+                        }
+                    });
                 } else {
                     console.log('Events: no data found.');
                 }
