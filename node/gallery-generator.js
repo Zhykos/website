@@ -19,7 +19,7 @@ fs.readFile('credentials.json', (err, content) => {
 });
 
 
-function printPage(rows) {
+function printPage(rowsScreenshots, rowsEvents) {
     var page = `<!DOCTYPE html>
 <html>
 
@@ -40,23 +40,34 @@ function printPage(rows) {
             <div class="heading">
                 <img class="img-fluid image" src="assets/img/gallery/logo.png" style="height: 100px;" />
                 <h2>Video Game Gallery by Zhykos.fr</h2>
-                Index: <a
+                Sheet index: <a
                     href="https://docs.google.com/spreadsheets/d/1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU/edit?usp=sharing">Google
                     Sheet</a><br />
-                Go back to main website: <a href="./index.html">Zhykos.fr</a><br />
+                Go back to main website: <a href="./index.html">Zhykos.fr</a><br /><br />
+                Links index: <a href="#screenshots">Screenshots</a> / <a href="#events">Events</a>
             </div>
             <div class="heading">
-                <h3>Thomas "Zhykos"'screenshots</h3>
+                <h3><a id="screenshots"></a>Thomas "Zhykos"'screenshots</h3>
+                ${rowsScreenshots.length} games
             </div>
             <div class="row no-gutters">`;
-    rows.map((row) => {
-        page += printOneGame(row);
+    rowsScreenshots.map((row) => {
+        page += printImageDiv(row, "screenshots");
+    });
+    page += `
+            </div>
+            <div class="heading" style="padding-top: 50px;">
+                <h3><a id="events"></a>Events</h3>
+                ${rowsEvents.length} events
+            </div>
+            <div class="row no-gutters">`;
+    rowsEvents.map((row) => {
+        page += printImageDiv(row, "events");
     });
     page += `
             </div>
         </div>
-    </section>
-    <section class="footer">
+        <br />
         <div>Logo made from 2 icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a
                 href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
     </section>
@@ -65,9 +76,8 @@ function printPage(rows) {
         baguetteBox.run('.compact-gallery', { animation: 'slideIn' });
     </script>
 </body>
-
 </html>`;
-    fs.writeFile('../video-game-gallery.html', page, function (err) {
+    fs.writeFile('../video-game-gallery.html', page, function(err) {
         if (err) {
             return console.log(err);
         }
@@ -75,29 +85,44 @@ function printPage(rows) {
     });
 }
 
-function printOneGame(columnsStr) {
-    const htmlImg = `assets/img/gallery/${getImageName(columnsStr[0])}.jpg`;
+function printImageDiv(columnsData, type) {
+    const htmlImg = `assets/img/gallery/${getImageName(columnsData, type)}.jpg`;
     if (fs.existsSync("../" + htmlImg)) {
-        return `
+        var url;
+        if (type == "screenshots") {
+            url = columnsData[4];
+        } else {
+            url = columnsData[3];
+        }
+        var imageDiv = `
         <div class="col-md-6 col-lg-3 item zoom-on-hover">
             <a class="lightbox"
-                href="${columnsStr[4]}">
+                href="${url}">
                 <img class="img-fluid image"
                     src="${htmlImg}" />
                 <span class="description">
-                    <span class="description-heading">${columnsStr[0]}</span>
-                    <span class="description-body">${columnsStr[1]} - ${columnsStr[2]} - ${columnsStr[3]}</span>
-                </span>
+                    <span class="description-heading">${columnsData[0]}</span>`;
+        if (type == "screenshots") {
+            imageDiv += `<span class="description-body">${columnsData[1]} - ${columnsData[2]} - ${columnsData[3]}</span>`;
+        } else {
+            imageDiv += `<span class="description-body">${columnsData[1]} - ${columnsData[2]}</span>`;
+        }
+        imageDiv += `</span>
             </a>
         </div>`;
+        return imageDiv;
     } else {
         console.error(`Image miniature n'existe pas : ${htmlImg}`);
         return "";
     }
 }
 
-function getImageName(gameName) {
-    return gameName.replace(/[^a-zA-Z0-9]/g, '-').replace(/-+/g, '-').replace(/-$/, '').replace("-early-access", '').replace("-alpha", '');
+function getImageName(columnsData, type) {
+    var imageName = columnsData[0].replace(/[^a-zA-Z0-9]/g, '-').replace(/-+/g, '-').replace(/-$/, '').replace("-early-access", '').replace("-alpha", '');
+    if (type == "events") {
+        imageName += '-' + columnsData[1];
+    }
+    return imageName;
 }
 
 /**
@@ -164,18 +189,51 @@ function print(auth) {
     sheets.spreadsheets.values.get({
         spreadsheetId: '1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU',
         range: 'Zhykos\'screenshots!A4:G',
-    }, (err, res) => {
-        if (err) {
-            return console.log('The API returned an error: ' + err);
+    }, (errScreenshots, resScreenshots) => {
+        if (errScreenshots) {
+            return console.log('The API returned an error: ' + errScreenshots);
         }
-        const rows = res.data.values;
-        if (rows.length) {
-            sortArray(rows);
-            printPage(rows);
+        const rowsScreenshots = resScreenshots.data.values;
+        if (rowsScreenshots.length) {
+            sortArray(rowsScreenshots);
+
+            sheets.spreadsheets.values.get({
+                spreadsheetId: '1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU',
+                range: 'Events!A4:E',
+            }, (errEvents, resEvents) => {
+                if (errEvents) {
+                    return console.log('The API returned an error: ' + errEvents);
+                }
+                const rowsEvents = resEvents.data.values;
+                if (rowsEvents.length) {
+                    sortArray(rowsEvents);
+                    printPage(rowsScreenshots, rowsEvents);
+                } else {
+                    console.log('Events: no data found.');
+                }
+            });
+        } else {
+            console.log('Screenshots: no data found.');
+        }
+    });
+
+    /*
+    sheets.spreadsheets.values.get({
+        spreadsheetId: '1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU',
+        range: 'Zhykos\'screenshots!A4:G',
+    }, (errScreenshots, resScreenshots) => {
+        if (errScreenshots) {
+            return console.log('The API returned an error: ' + errScreenshots);
+        }
+        const rowsScreenshots = resScreenshots.data.values;
+        if (rowsScreenshots.length) {
+            sortArray(rowsScreenshots);
+            printPage(rowsScreenshots);
         } else {
             console.log('No data found.');
         }
     });
+    */
 }
 
 function sortArray(array) {
@@ -183,7 +241,7 @@ function sortArray(array) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
     }*/
-    array.sort(function (obj1, obj2) {
+    array.sort(function(obj1, obj2) {
         return obj1[0] < obj2[0];
     });
 }
