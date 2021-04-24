@@ -19,7 +19,7 @@ fs.readFile('credentials.json', (err, content) => {
 });
 
 
-function printPage(rowsScreenshots, rowsEvents, rowsPressKits) {
+function printPage(rowsScreenshots, rowsEvents) {
     var page = `<!DOCTYPE html>
 <html>
 
@@ -63,16 +63,6 @@ function printPage(rowsScreenshots, rowsEvents, rowsPressKits) {
             <div class="row no-gutters">`;
     rowsEvents.map((row) => {
         page += printImageDiv(row, "events");
-    });
-    page += `
-            </div>
-            <div class="heading" style="padding-top: 50px;">
-                <h3><a id="presskits"></a>Press kits</h3>
-                ${rowsPressKits.length} games
-            </div>
-            <div class="row no-gutters">`;
-    rowsPressKits.map((row) => {
-        page += printImageDiv(row, "presskits");
     });
     page += `
             </div>
@@ -221,22 +211,7 @@ function print(auth) {
                 const rowsEvents = resEvents.data.values;
                 if (rowsEvents.length) {
                     sortArray(rowsEvents);
-
-                    sheets.spreadsheets.values.get({
-                        spreadsheetId: '1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU',
-                        range: 'Press kits!A4:C',
-                    }, (errPressKits, resPressKits) => {
-                        if (errPressKits) {
-                            return console.log('The API returned an error: ' + errPressKits);
-                        }
-                        const rowsPressKits = resPressKits.data.values;
-                        if (rowsPressKits.length) {
-                            sortArray(rowsPressKits);
-                            printPage(rowsScreenshots, rowsEvents, rowsPressKits);
-                        } else {
-                            console.log('Press kits. no data found.');
-                        }
-                    });
+                    printPage(rowsScreenshots, rowsEvents);
                 } else {
                     console.log('Events: no data found.');
                 }
