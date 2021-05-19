@@ -44,7 +44,7 @@ function printPage(rowsScreenshots, rowsEvents) {
                     href="https://docs.google.com/spreadsheets/d/1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU/edit?usp=sharing">Google
                     Sheet</a><br />
                 Go back to main website: <a href="./index.html">Zhykos.fr</a><br /><br />
-                Links index: <a href="#screenshots">Screenshots</a> / <a href="#events">Events</a> / <a href="#presskits">Press kits</a>
+                Links index: <a href="#screenshots">Screenshots</a> / <a href="#events">Events</a>
             </div>
             <div class="heading">
                 <h3><a id="screenshots"></a>Thomas "Zhykos"'screenshots</h3>
