@@ -122,7 +122,7 @@ function printImageDiv(columnsData, type) {
 }
 
 function getImageName(columnsData, type) {
-    var imageName = columnsData[0].replace(/[^a-zA-Z0-9]/g, '-').replace(/-+/g, '-').replace(/-$/, '').replace("-early-access", '').replace("-alpha", '');
+    var imageName = columnsData[0].replace(/[^a-zA-Z0-9]/g, '-').replace(/-+/g, '-').replace(/-$/, '').replace("-early-access", '').replace("-alpha", '').replace("-beta", '');
     if (type == "events") {
         imageName += '-' + columnsData[1];
     }
