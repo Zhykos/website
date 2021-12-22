@@ -108,8 +108,6 @@ function printImageDiv(columnsData, type) {
             imageDiv += `<span class="description-body">${columnsData[1]} - ${columnsData[2]} - ${columnsData[3]}</span>`;
         } else if (type == "events") {
             imageDiv += `<span class="description-body">${columnsData[1]} - ${columnsData[2]}</span>`;
-        } else {
-            // imageDiv += `<span class="description-body">${columnsData[1]} - ${columnsData[2]}</span>`;
         }
         imageDiv += `</span>
             </a>
@@ -122,7 +120,7 @@ function printImageDiv(columnsData, type) {
 }
 
 function getImageName(columnsData, type) {
-    var imageName = columnsData[0].replace(/[^a-zA-Z0-9]/g, '-').replace(/-+/g, '-').replace(/-$/, '').replace("-early-access", '').replace("-alpha", '').replace("-beta", '');
+    var imageName = columnsData[0].replace(/[^a-zA-Z0-9]/g, '-').replace(/-+/g, '-').replace(/-$/, '').replace("-early-access", '').replace("-alpha", '').replace("-beta", '').replace("-closed", '');
     if (type == "events") {
         imageName += '-' + columnsData[1];
     }
@@ -174,9 +172,9 @@ function getNewToken(oAuth2Client, callback) {
             }
             oAuth2Client.setCredentials(token);
             // Store the token to disk for later program executions
-            fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-                if (err) {
-                    return console.error(err);
+            fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err2) => {
+                if (err2) {
+                    return console.error(err2);
                 }
                 console.log('Token stored to', TOKEN_PATH);
             });
@@ -220,31 +218,9 @@ function print(auth) {
             console.log('Screenshots: no data found.');
         }
     });
-
-    /*
-    sheets.spreadsheets.values.get({
-        spreadsheetId: '1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU',
-        range: 'Zhykos\'screenshots!A4:G',
-    }, (errScreenshots, resScreenshots) => {
-        if (errScreenshots) {
-            return console.log('The API returned an error: ' + errScreenshots);
-        }
-        const rowsScreenshots = resScreenshots.data.values;
-        if (rowsScreenshots.length) {
-            sortArray(rowsScreenshots);
-            printPage(rowsScreenshots);
-        } else {
-            console.log('No data found.');
-        }
-    });
-    */
 }
 
 function sortArray(array) {
-    /*for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }*/
     array.sort(function(obj1, obj2) {
         return obj1[0] < obj2[0];
     });
