@@ -20,6 +20,7 @@ jobs:
         node-version: 14.x
         cache: 'npm'
     - run: |
+        npm i
         cd node
         echo ${{ secrets.GOOGLE_CREDENTIALS }} > credentials.json
         echo ${{ secrets.GOOGLE_TOKEN }} > token.json
