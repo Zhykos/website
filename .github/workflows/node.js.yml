@@ -24,9 +24,23 @@ jobs:
         cd node
         node -e "require('fs').writeFileSync('credentials.json', '${{ secrets.GOOGLE_CREDENTIALS }}', {encoding: 'base64'});"
         node -e "require('fs').writeFileSync('token.json', '${{ secrets.GOOGLE_TOKEN }}', {encoding: 'base64'});"
-        cat credentials.json
-        cat token.json
     - name: Installation des modules
       run: npm i
     - name: Lancement du script
       run: npm run start
+    - name: Upload
+      uses: SamKirkland/FTP-Deploy-Action@4.2.0
+      with:
+        server: ${{ secrets.FTP_HOST }}
+        username: ${{ secrets.FTP_USER }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: public_html/
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          **/node/**
+          **/.settings/**
+          .gitignore
+          .project
+          package*.json
