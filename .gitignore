@@ -1,7 +1,7 @@
 /.project
 .settings
 /assets/img/portfolio/portfolio
-/node/node_modules
+/node_modules
 /node/credentials.json
 /node/token.json
 video-game-gallery.html
