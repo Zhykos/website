@@ -24,6 +24,8 @@ jobs:
         cd node
         echo ${{ secrets.GOOGLE_CREDENTIALS }} > credentials.json
         echo ${{ secrets.GOOGLE_TOKEN }} > token.json
+        cat credentials.json
+        cat token.json
     - name: Installation des modules
       run: npm i
     - name: Lancement du script
