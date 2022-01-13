@@ -19,9 +19,12 @@ jobs:
       with:
         node-version: 14.x
         cache: 'npm'
-    - run: |
-        npm i
+    - name: Credentials
+      run: |
         cd node
         echo ${{ secrets.GOOGLE_CREDENTIALS }} > credentials.json
         echo ${{ secrets.GOOGLE_TOKEN }} > token.json
-        node .
+    - name: Installation des modules
+      run: npm i
+    - name: Lancement du script
+      run: npm run start
