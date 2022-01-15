@@ -1,15 +1,15 @@
 {
-    "name": "node",
+    "name": "zhykos-website",
     "version": "1.0.0",
-    "description": "",
+    "description": "Zhykos' website: https://www.zhykos.fr",
     "dependencies": {
+        "dotenv": "^12.0.3",
         "googleapis": "^68.0.0"
     },
-    "devDependencies": {},
     "scripts": {
-        "start": "cd node && node gallery-generator.js",
+        "start": "cd node && node -r dotenv/config gallery-generator.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "",
-    "license": "ISC"
+    "license": "MIT"
 }

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const readline = require('readline');
 const { google } = require('googleapis');
+require('dotenv').config();
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
@@ -12,15 +13,24 @@ const TOKEN_PATH = 'token.json';
 // Load client secrets from a local file.
 fs.readFile('credentials.json', (err, content) => {
     if (err) {
-        return console.log('Error loading client secret file:', err);
-    }
-    // Authorize a client with credentials, then call the Google Sheets API.
-    try {
-        authorize(JSON.parse(content), print);
-    } catch (exception) {
-        // XXX No error on prod!
+        logErrorIfDebug('Error loading client secret file', err)
+    } else {
+        // Authorize a client with credentials, then call the Google Sheets API.
+        try {
+            authorize(JSON.parse(content), print);
+        } catch (exception) {
+            logErrorIfDebug('Error parsing client secret file', exception)
+        }
     }
 });
+
+function logErrorIfDebug(errorMsg, errorObj) {
+    if (process.env.DEBUG === "true") {
+        console.error(errorMsg + ':', errorObj);
+    } else {
+        console.error(errorMsg);
+    }
+}
 
 
 function printPage(rowsScreenshots, rowsEvents) {
@@ -150,7 +160,7 @@ function authorize(credentials, callback) {
         try {
             oAuth2Client.setCredentials(JSON.parse(token));
         } catch (exception) {
-            // XXX No error on prod!
+            logErrorIfDebug("Error parsing token file", exception);
         }
         callback(oAuth2Client);
     });
