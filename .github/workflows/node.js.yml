@@ -5,7 +5,7 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ latest ]
 
 jobs:
   build-and-deploy:
@@ -61,5 +61,7 @@ jobs:
       with:
         node-version: 14.x
         cache: 'npm'
+    - name: Installation des modules
+      run: npm i
     - name: Run tests
       run: npm run test
