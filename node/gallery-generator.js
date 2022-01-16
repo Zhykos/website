@@ -24,13 +24,15 @@ fs.readFile('credentials.json', (err, content) => {
     }
 });
 
-export function logErrorIfDebug(errorMsg, errorObj) {
+function logErrorIfDebug(errorMsg, errorObj) {
     if (process.env.DEBUG === 'true') {
-        console.error(errorMsg + ':', errorObj);
+        console.error(errorMsg + ':');
+        console.error(errorObj);
     } else {
         console.error(errorMsg);
     }
 }
+exports.logErrorIfDebug = logErrorIfDebug;
 
 function printPage(rowsScreenshots, rowsEvents) {
     var page = `<!DOCTYPE html>
@@ -90,7 +92,7 @@ function printPage(rowsScreenshots, rowsEvents) {
     </script>
 </body>
 </html>`;
-    fs.writeFile('../video-game-gallery.html', page, function (err) {
+    fs.writeFile('../video-game-gallery.html', page, function(err) {
         if (err) {
             return console.log(err);
         }
@@ -218,8 +220,7 @@ function getNewToken(oAuth2Client, callback) {
  */
 function print(auth) {
     const sheets = google.sheets({ version: 'v4', auth });
-    sheets.spreadsheets.values.get(
-        {
+    sheets.spreadsheets.values.get({
             spreadsheetId: '1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU',
             range: "Zhykos'screenshots!A4:G",
         },
@@ -233,10 +234,8 @@ function print(auth) {
             if (rowsScreenshots.length) {
                 sortArray(rowsScreenshots);
 
-                sheets.spreadsheets.values.get(
-                    {
-                        spreadsheetId:
-                            '1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU',
+                sheets.spreadsheets.values.get({
+                        spreadsheetId: '1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU',
                         range: 'Events!A4:E',
                     },
                     (errEvents, resEvents) => {
@@ -262,7 +261,7 @@ function print(auth) {
 }
 
 function sortArray(array) {
-    array.sort(function (obj1, obj2) {
+    array.sort(function(obj1, obj2) {
         return obj1[0] < obj2[0];
     });
 }
