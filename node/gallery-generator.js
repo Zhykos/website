@@ -13,25 +13,24 @@ const TOKEN_PATH = 'token.json';
 // Load client secrets from a local file.
 fs.readFile('credentials.json', (err, content) => {
     if (err) {
-        logErrorIfDebug('Error loading client secret file', err)
+        logErrorIfDebug('Error loading client secret file', err);
     } else {
         // Authorize a client with credentials, then call the Google Sheets API.
         try {
             authorize(JSON.parse(content), print);
         } catch (exception) {
-            logErrorIfDebug('Error parsing client secret file', exception)
+            logErrorIfDebug('Error parsing client secret file', exception);
         }
     }
 });
 
-function logErrorIfDebug(errorMsg, errorObj) {
-    if (process.env.DEBUG === "true") {
+export function logErrorIfDebug(errorMsg, errorObj) {
+    if (process.env.DEBUG === 'true') {
         console.error(errorMsg + ':', errorObj);
     } else {
         console.error(errorMsg);
     }
 }
-
 
 function printPage(rowsScreenshots, rowsEvents) {
     var page = `<!DOCTYPE html>
@@ -66,7 +65,7 @@ function printPage(rowsScreenshots, rowsEvents) {
             </div>
             <div class="row no-gutters">`;
     rowsScreenshots.map((row) => {
-        page += printImageDiv(row, "screenshots");
+        page += printImageDiv(row, 'screenshots');
     });
     page += `
             </div>
@@ -76,7 +75,7 @@ function printPage(rowsScreenshots, rowsEvents) {
             </div>
             <div class="row no-gutters">`;
     rowsEvents.map((row) => {
-        page += printImageDiv(row, "events");
+        page += printImageDiv(row, 'events');
     });
     page += `
             </div>
@@ -91,7 +90,7 @@ function printPage(rowsScreenshots, rowsEvents) {
     </script>
 </body>
 </html>`;
-    fs.writeFile('../video-game-gallery.html', page, function(err) {
+    fs.writeFile('../video-game-gallery.html', page, function (err) {
         if (err) {
             return console.log(err);
         }
@@ -101,11 +100,11 @@ function printPage(rowsScreenshots, rowsEvents) {
 
 function printImageDiv(columnsData, type) {
     const htmlImg = `assets/img/gallery/${getImageName(columnsData, type)}.jpg`;
-    if (fs.existsSync("../" + htmlImg)) {
+    if (fs.existsSync('../' + htmlImg)) {
         var url;
-        if (type == "screenshots") {
+        if (type == 'screenshots') {
             url = columnsData[4];
-        } else if (type == "events") {
+        } else if (type == 'events') {
             url = columnsData[3];
         } else {
             url = columnsData[1];
@@ -118,9 +117,9 @@ function printImageDiv(columnsData, type) {
                     src="${htmlImg}" />
                 <span class="description">
                     <span class="description-heading">${columnsData[0]}</span>`;
-        if (type == "screenshots") {
+        if (type == 'screenshots') {
             imageDiv += `<span class="description-body">${columnsData[1]} - ${columnsData[2]} - ${columnsData[3]}</span>`;
-        } else if (type == "events") {
+        } else if (type == 'events') {
             imageDiv += `<span class="description-body">${columnsData[1]} - ${columnsData[2]}</span>`;
         }
         imageDiv += `</span>
@@ -129,13 +128,20 @@ function printImageDiv(columnsData, type) {
         return imageDiv;
     } else {
         console.error(`Image miniature n'existe pas : ${htmlImg}`);
-        return "";
+        return '';
     }
 }
 
 function getImageName(columnsData, type) {
-    var imageName = columnsData[0].replace(/[^a-zA-Z0-9]/g, '-').replace(/-+/g, '-').replace(/-$/, '').replace("-early-access", '').replace("-alpha", '').replace("-beta", '').replace("-closed", '');
-    if (type == "events") {
+    var imageName = columnsData[0]
+        .replace(/[^a-zA-Z0-9]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/-$/, '')
+        .replace('-early-access', '')
+        .replace('-alpha', '')
+        .replace('-beta', '')
+        .replace('-closed', '');
+    if (type == 'events') {
         imageName += '-' + columnsData[1];
     }
     return imageName;
@@ -150,7 +156,10 @@ function getImageName(columnsData, type) {
 function authorize(credentials, callback) {
     const { client_secret, client_id, redirect_uris } = credentials.installed;
     const oAuth2Client = new google.auth.OAuth2(
-        client_id, client_secret, redirect_uris[0]);
+        client_id,
+        client_secret,
+        redirect_uris[0]
+    );
 
     // Check if we have previously stored a token.
     fs.readFile(TOKEN_PATH, (err, token) => {
@@ -160,7 +169,7 @@ function authorize(credentials, callback) {
         try {
             oAuth2Client.setCredentials(JSON.parse(token));
         } catch (exception) {
-            logErrorIfDebug("Error parsing token file", exception);
+            logErrorIfDebug('Error parsing token file', exception);
         }
         callback(oAuth2Client);
     });
@@ -186,7 +195,10 @@ function getNewToken(oAuth2Client, callback) {
         rl.close();
         oAuth2Client.getToken(code, (err, token) => {
             if (err) {
-                return console.error('Error while trying to retrieve access token', err);
+                return console.error(
+                    'Error while trying to retrieve access token',
+                    err
+                );
             }
             oAuth2Client.setCredentials(token);
             // Store the token to disk for later program executions
@@ -206,40 +218,51 @@ function getNewToken(oAuth2Client, callback) {
  */
 function print(auth) {
     const sheets = google.sheets({ version: 'v4', auth });
-    sheets.spreadsheets.values.get({
-        spreadsheetId: '1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU',
-        range: 'Zhykos\'screenshots!A4:G',
-    }, (errScreenshots, resScreenshots) => {
-        if (errScreenshots) {
-            return console.log('The API returned an error: ' + errScreenshots);
-        }
-        const rowsScreenshots = resScreenshots.data.values;
-        if (rowsScreenshots.length) {
-            sortArray(rowsScreenshots);
+    sheets.spreadsheets.values.get(
+        {
+            spreadsheetId: '1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU',
+            range: "Zhykos'screenshots!A4:G",
+        },
+        (errScreenshots, resScreenshots) => {
+            if (errScreenshots) {
+                return console.log(
+                    'The API returned an error: ' + errScreenshots
+                );
+            }
+            const rowsScreenshots = resScreenshots.data.values;
+            if (rowsScreenshots.length) {
+                sortArray(rowsScreenshots);
 
-            sheets.spreadsheets.values.get({
-                spreadsheetId: '1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU',
-                range: 'Events!A4:E',
-            }, (errEvents, resEvents) => {
-                if (errEvents) {
-                    return console.log('The API returned an error: ' + errEvents);
-                }
-                const rowsEvents = resEvents.data.values;
-                if (rowsEvents.length) {
-                    sortArray(rowsEvents);
-                    printPage(rowsScreenshots, rowsEvents);
-                } else {
-                    console.log('Events: no data found.');
-                }
-            });
-        } else {
-            console.log('Screenshots: no data found.');
+                sheets.spreadsheets.values.get(
+                    {
+                        spreadsheetId:
+                            '1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU',
+                        range: 'Events!A4:E',
+                    },
+                    (errEvents, resEvents) => {
+                        if (errEvents) {
+                            return console.log(
+                                'The API returned an error: ' + errEvents
+                            );
+                        }
+                        const rowsEvents = resEvents.data.values;
+                        if (rowsEvents.length) {
+                            sortArray(rowsEvents);
+                            printPage(rowsScreenshots, rowsEvents);
+                        } else {
+                            console.log('Events: no data found.');
+                        }
+                    }
+                );
+            } else {
+                console.log('Screenshots: no data found.');
+            }
         }
-    });
+    );
 }
 
 function sortArray(array) {
-    array.sort(function(obj1, obj2) {
+    array.sort(function (obj1, obj2) {
         return obj1[0] < obj2[0];
     });
 }
