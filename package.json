@@ -10,7 +10,8 @@
     "scripts": {
         "start": "cd node && node -r dotenv/config gallery-generator.js",
         "test": "cd node && jest --coverage",
-        "test-dev": "cd node && jest --watchAll --coverage"
+        "test-dev": "cd node && jest --watchAll --coverage",
+        "pretty": "npx prettier --write ./node/"
     },
     "author": "Thomas 'Zhykos' Cicognani",
     "license": "MIT",
