@@ -48,6 +48,7 @@ jobs:
           package*.json
           **/.vscode/**
           *.md
+          .prettierrc
 
   tests:
     runs-on: ubuntu-latest
