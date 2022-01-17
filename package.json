@@ -25,6 +25,9 @@
             "text-summary",
             "text",
             "json-summary"
+        ],
+        "watchPathIgnorePatterns": [
+            "node/etc/"
         ]
     }
 }

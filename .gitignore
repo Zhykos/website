@@ -2,7 +2,6 @@
 .settings
 /assets/img/portfolio/portfolio
 /node_modules
-/node/credentials.json
-/node/token.json
+/node/etc/
 video-game-gallery.html
 coverage/

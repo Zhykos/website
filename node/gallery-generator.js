@@ -8,21 +8,20 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
-const TOKEN_PATH = 'token.json';
+const TOKEN_PATH = './etc/token.json';
+
+generate();
 
 // Load client secrets from a local file.
-fs.readFile('credentials.json', (err, content) => {
-    if (err) {
-        logErrorIfDebug('Error loading client secret file', err);
-    } else {
-        // Authorize a client with credentials, then call the Google Sheets API.
-        try {
-            authorize(JSON.parse(content), print);
-        } catch (exception) {
-            logErrorIfDebug('Error parsing client secret file', exception);
-        }
+function generate() {
+    try {
+        const content = fs.readFileSync('./etc/credentials.json');
+        authorize(JSON.parse(content), print);
+    } catch (exception) {
+        logErrorIfDebug('Error parsing client secret file', exception);
     }
-});
+}
+exports.generate = generate;
 
 function logErrorIfDebug(errorMsg, errorObj) {
     if (process.env.DEBUG === 'true') {
@@ -92,13 +91,9 @@ function printPage(rowsScreenshots, rowsEvents) {
     </script>
 </body>
 </html>`;
-    fs.writeFile('../video-game-gallery.html', page, function (err) {
-        if (err) {
-            return console.log(err);
-        }
-        console.log('Fichier écrit.');
-    });
+    return page;
 }
+exports.printPage = printPage;
 
 function printImageDiv(columnsData, type) {
     const htmlImg = `assets/img/gallery/${getImageName(columnsData, type)}.jpg`;
@@ -106,10 +101,8 @@ function printImageDiv(columnsData, type) {
         var url;
         if (type == 'screenshots') {
             url = columnsData[4];
-        } else if (type == 'events') {
-            url = columnsData[3];
         } else {
-            url = columnsData[1];
+            url = columnsData[3];
         }
         var imageDiv = `
         <div class="col-md-6 col-lg-3 item zoom-on-hover">
@@ -133,6 +126,7 @@ function printImageDiv(columnsData, type) {
         return '';
     }
 }
+exports.printImageDiv = printImageDiv;
 
 function getImageName(columnsData, type) {
     var imageName = columnsData[0]
@@ -164,17 +158,23 @@ function authorize(credentials, callback) {
     );
 
     // Check if we have previously stored a token.
-    fs.readFile(TOKEN_PATH, (err, token) => {
-        if (err) {
-            return getNewToken(oAuth2Client, callback);
-        }
-        try {
-            oAuth2Client.setCredentials(JSON.parse(token));
-        } catch (exception) {
-            logErrorIfDebug('Error parsing token file', exception);
-        }
+    let token;
+    try {
+        token = fs.readFileSync(TOKEN_PATH);
+    } catch (exception) {
+        logErrorIfDebug('Error reading token file', exception);
+        return getNewToken(oAuth2Client, callback);
+    }
+    try {
+        oAuth2Client.setCredentials(JSON.parse(token));
+    } catch (exception) {
+        return logErrorIfDebug('Error parsing token file', exception);
+    }
+    try {
         callback(oAuth2Client);
-    });
+    } catch (exception) {
+        logErrorIfDebug('Error generating document', exception);
+    }
 }
 
 /**
@@ -193,6 +193,7 @@ function getNewToken(oAuth2Client, callback) {
         input: process.stdin,
         output: process.stdout,
     });
+    // No need to cover this question with test!
     rl.question('Enter the code from that page here: ', (code) => {
         rl.close();
         oAuth2Client.getToken(code, (err, token) => {
@@ -220,51 +221,55 @@ function getNewToken(oAuth2Client, callback) {
  */
 function print(auth) {
     const sheets = google.sheets({ version: 'v4', auth });
-    sheets.spreadsheets.values.get(
-        {
+    sheets.spreadsheets.values.get({
             spreadsheetId: '1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU',
             range: "Zhykos'screenshots!A4:G",
         },
         (errScreenshots, resScreenshots) => {
             if (errScreenshots) {
-                return console.log(
-                    'The API returned an error: ' + errScreenshots
-                );
+                return logErrorIfDebug('The API returned an error (get screenshots)', errScreenshots)
             }
             const rowsScreenshots = resScreenshots.data.values;
             if (rowsScreenshots.length) {
                 sortArray(rowsScreenshots);
 
-                sheets.spreadsheets.values.get(
-                    {
-                        spreadsheetId:
-                            '1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU',
+                sheets.spreadsheets.values.get({
+                        spreadsheetId: '1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU',
                         range: 'Events!A4:E',
                     },
                     (errEvents, resEvents) => {
                         if (errEvents) {
-                            return console.log(
-                                'The API returned an error: ' + errEvents
-                            );
+                            return logErrorIfDebug('The API returned an error (get events)', errEvents)
                         }
                         const rowsEvents = resEvents.data.values;
                         if (rowsEvents.length) {
                             sortArray(rowsEvents);
-                            printPage(rowsScreenshots, rowsEvents);
+                            const page = printPage(rowsScreenshots, rowsEvents);
+                            try {
+                                fs.writeFileSync('../video-game-gallery.html', page);
+                                console.log('Fichier écrit.');
+                            } catch (err) {
+                                return logErrorIfDebug('Error writing file', err)
+                            }
                         } else {
-                            console.log('Events: no data found.');
+                            console.error('Events: no data found.');
                         }
                     }
                 );
             } else {
-                console.log('Screenshots: no data found.');
+                console.error('Screenshots: no data found.');
             }
         }
     );
 }
+exports.print = print;
 
 function sortArray(array) {
-    array.sort(function (obj1, obj2) {
-        return obj1[0] < obj2[0];
+    array.sort(function(obj1, obj2) {
+        if (obj1[0] < obj2[0]) {
+            return -1;
+        }
+        return 1;
     });
 }
+exports.sortArray = sortArray;

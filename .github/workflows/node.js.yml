@@ -24,8 +24,9 @@ jobs:
     - name: Credentials
       run: |
         cd node
-        node -e "require('fs').writeFileSync('credentials.json', '${{ secrets.GOOGLE_CREDENTIALS }}', {encoding: 'base64'});"
-        node -e "require('fs').writeFileSync('token.json', '${{ secrets.GOOGLE_TOKEN }}', {encoding: 'base64'});"
+        mkdir etc
+        node -e "require('fs').writeFileSync('./etc/credentials.json', '${{ secrets.GOOGLE_CREDENTIALS }}', {encoding: 'base64'});"
+        node -e "require('fs').writeFileSync('./etc/token.json', '${{ secrets.GOOGLE_TOKEN }}', {encoding: 'base64'});"
     - name: Installation des modules
       run: npm i
     - name: Lancement du script
