@@ -17,6 +17,13 @@ const resultFile = '../video-game-gallery.html'
 const credentialsFile = './etc/credentials.json'
 const tokenFile = './etc/token.json'
 
+
+beforeAll(() => {
+    if (!fs.existsSync("./etc/")) {
+        fs.mkdirSync("./etc/")
+    }
+});
+
 beforeEach(() => {
     console.log = mockedConsoleLog;
     console.error = mockedConsoleError;
@@ -26,7 +33,8 @@ beforeEach(() => {
     jest.clearAllMocks();
     jest.resetAllMocks()
     assertDeleteFile(resultFile);
-    // assertDeleteFile(credentialsFile)
+    assertDeleteFile(credentialsFile)
+    assertDeleteFile(tokenFile)
 });
 
 afterEach(() => {
@@ -36,7 +44,8 @@ afterEach(() => {
     jest.clearAllMocks();
     jest.resetAllMocks()
     assertDeleteFile(resultFile);
-    // assertDeleteFile(credentialsFile)
+    assertDeleteFile(credentialsFile)
+    assertDeleteFile(tokenFile)
 });
 
 test('Log error, no debug', () => {
@@ -240,7 +249,6 @@ test('Print; screenshots range OK; events range OK ; error writing file', () => 
 });
 
 test('Generate ; no credentials', () => {
-    assertDeleteFile(credentialsFile)
     generate();
 
     expect(consoleErrorOutput).toMatchObject(['Error parsing client secret file']);
@@ -248,7 +256,6 @@ test('Generate ; no credentials', () => {
 });
 
 test('Generate ; wrong credentials format', () => {
-    assertDeleteFile(credentialsFile)
     originalWriteFileSync(credentialsFile, "foo");
 
     generate();
@@ -258,8 +265,6 @@ test('Generate ; wrong credentials format', () => {
 });
 
 test('Generate ; no token', () => {
-    assertDeleteFile(credentialsFile)
-    assertDeleteFile(tokenFile)
     originalWriteFileSync(credentialsFile, JSON.stringify({ installed: { client_secret: 'secret', client_id: 'id', redirect_uris: [''] } }));
 
     generate();
@@ -275,7 +280,6 @@ test('Generate ; no token', () => {
 });
 
 test('Generate ; wrong token format', () => {
-    assertDeleteFile(credentialsFile)
     originalWriteFileSync(credentialsFile, JSON.stringify({ installed: { client_secret: 'secret', client_id: 'id', redirect_uris: [''] } }));
     originalWriteFileSync(tokenFile, "foo")
 
@@ -286,8 +290,6 @@ test('Generate ; wrong token format', () => {
 });
 
 test('Generate ; error', () => {
-    assertDeleteFile(credentialsFile)
-    assertDeleteFile(tokenFile)
     originalWriteFileSync(credentialsFile, JSON.stringify({ installed: { client_secret: 'secret', client_id: 'id', redirect_uris: [''] } }));
     originalWriteFileSync(tokenFile, "{}")
 
@@ -298,8 +300,6 @@ test('Generate ; error', () => {
 });
 
 test('Generate ; check call print', () => {
-    assertDeleteFile(credentialsFile)
-    assertDeleteFile(tokenFile)
     originalWriteFileSync(credentialsFile, JSON.stringify({ installed: { client_secret: 'secret', client_id: 'id', redirect_uris: [''] } }));
     originalWriteFileSync(tokenFile, "{}")
 
