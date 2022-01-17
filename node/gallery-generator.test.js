@@ -1,5 +1,12 @@
 const { google } = require('googleapis');
-const { logErrorIfDebug, printPage, printImageDiv, sortArray, print, generate } = require('./gallery-generator.js');
+const {
+    logErrorIfDebug,
+    printPage,
+    printImageDiv,
+    sortArray,
+    print,
+    generate,
+} = require('./gallery-generator.js');
 const fs = require('fs');
 const readline = require('readline');
 
@@ -13,14 +20,13 @@ const mockedConsoleLog = (output) => consoleLogOutput.push(output);
 
 const originalWriteFileSync = fs.writeFileSync;
 
-const resultFile = '../video-game-gallery.html'
-const credentialsFile = './etc/credentials.json'
-const tokenFile = './etc/token.json'
-
+const resultFile = '../video-game-gallery.html';
+const credentialsFile = './etc/credentials.json';
+const tokenFile = './etc/token.json';
 
 beforeAll(() => {
-    if (!fs.existsSync("./etc/")) {
-        fs.mkdirSync("./etc/")
+    if (!fs.existsSync('./etc/')) {
+        fs.mkdirSync('./etc/');
     }
 });
 
@@ -31,10 +37,10 @@ beforeEach(() => {
     consoleErrorOutput = [];
     process.env.DEBUG = false;
     jest.clearAllMocks();
-    jest.resetAllMocks()
+    jest.resetAllMocks();
     assertDeleteFile(resultFile);
-    assertDeleteFile(credentialsFile)
-    assertDeleteFile(tokenFile)
+    assertDeleteFile(credentialsFile);
+    assertDeleteFile(tokenFile);
 });
 
 afterEach(() => {
@@ -42,10 +48,10 @@ afterEach(() => {
     console.error = originalConsoleError;
     process.env.DEBUG = false;
     jest.clearAllMocks();
-    jest.resetAllMocks()
+    jest.resetAllMocks();
     assertDeleteFile(resultFile);
-    assertDeleteFile(credentialsFile)
-    assertDeleteFile(tokenFile)
+    assertDeleteFile(credentialsFile);
+    assertDeleteFile(tokenFile);
 });
 
 test('Log error, no debug', () => {
@@ -111,29 +117,17 @@ test('Print page 2 games and 2 events', () => {
 });
 
 test('Print image div no image file', () => {
-    const game = [
-        'GAMES DOES NOT EXIST',
-    ]
+    const game = ['GAMES DOES NOT EXIST'];
     const page = printImageDiv(game, 'screenshots');
-    expect(page).toBe('')
-    expect(consoleErrorOutput.length).toBe(1)
+    expect(page).toBe('');
+    expect(consoleErrorOutput.length).toBe(1);
     expect(consoleErrorOutput[0]).toMatch(/^Image miniature n'existe pas : /);
 });
 
 test('Sort array google sheet', () => {
-    const games = [
-        [
-            'Z'
-        ],
-        [
-            'A'
-        ],
-        [
-            'B'
-        ]
-    ];
-    sortArray(games)
-    expect(games.length).toBe(3)
+    const games = [['Z'], ['A'], ['B']];
+    sortArray(games);
+    expect(games.length).toBe(3);
     expect(games[0][0]).toBe('A');
     expect(games[1][0]).toBe('B');
     expect(games[2][0]).toBe('Z');
@@ -144,7 +138,10 @@ test('Print; error screenshots range', () => {
 
     print();
 
-    expect(consoleErrorOutput).toMatchObject(["The API returned an error (get screenshots):", "Error A"]);
+    expect(consoleErrorOutput).toMatchObject([
+        'The API returned an error (get screenshots):',
+        'Error A',
+    ]);
     assertAbsentFile(resultFile);
 });
 
@@ -153,35 +150,32 @@ test('Print; screenshots range; no data', () => {
 
     print();
 
-    expect(consoleErrorOutput).toMatchObject(["Screenshots: no data found."]);
+    expect(consoleErrorOutput).toMatchObject(['Screenshots: no data found.']);
     assertAbsentFile(resultFile);
 });
 
 test('Print; screenshots range OK; error events range', () => {
-    const games = [
-        [
-            'Castle Crashers'
-        ]
-    ];
+    const games = [['Castle Crashers']];
     initMockGoogleApi(undefined, { data: { values: games } }, 'Error B');
 
     print();
 
-    expect(consoleErrorOutput).toMatchObject(["The API returned an error (get events):", "Error B"]);
+    expect(consoleErrorOutput).toMatchObject([
+        'The API returned an error (get events):',
+        'Error B',
+    ]);
     assertAbsentFile(resultFile);
 });
 
 test('Print; screenshots range OK; events range no data', () => {
-    const games = [
-        [
-            'Castle Crashers'
-        ]
-    ];
-    initMockGoogleApi(undefined, { data: { values: games } }, undefined, { data: { values: [] } });
+    const games = [['Castle Crashers']];
+    initMockGoogleApi(undefined, { data: { values: games } }, undefined, {
+        data: { values: [] },
+    });
 
     print();
 
-    expect(consoleErrorOutput).toMatchObject(["Events: no data found."]);
+    expect(consoleErrorOutput).toMatchObject(['Events: no data found.']);
     assertAbsentFile(resultFile);
 });
 
@@ -194,7 +188,7 @@ test('Print; screenshots range OK; events range OK', () => {
             'None',
             'https://www.amazon.fr/photos/share/BhLQTEtDMf3evynYbZXEFKy9esdJJ0lCwo1k42J4YZB',
             'https://www.igdb.com/games/castle-crashers',
-        ]
+        ],
     ];
     const events = [
         [
@@ -203,9 +197,11 @@ test('Print; screenshots range OK; events range OK', () => {
             'France',
             'https://www.amazon.fr/photos/share/zGgsGvndsaFUtiCUYnWQVxlkU06eOHNWwCh3PR7Lg76',
             'https://www.stunfest.com',
-        ]
+        ],
     ];
-    initMockGoogleApi(undefined, { data: { values: games } }, undefined, { data: { values: events } });
+    initMockGoogleApi(undefined, { data: { values: games } }, undefined, {
+        data: { values: events },
+    });
 
     print();
 
@@ -224,7 +220,7 @@ test('Print; screenshots range OK; events range OK ; error writing file', () => 
             'None',
             'https://www.amazon.fr/photos/share/BhLQTEtDMf3evynYbZXEFKy9esdJJ0lCwo1k42J4YZB',
             'https://www.igdb.com/games/castle-crashers',
-        ]
+        ],
     ];
     const events = [
         [
@@ -233,55 +229,81 @@ test('Print; screenshots range OK; events range OK ; error writing file', () => 
             'France',
             'https://www.amazon.fr/photos/share/zGgsGvndsaFUtiCUYnWQVxlkU06eOHNWwCh3PR7Lg76',
             'https://www.stunfest.com',
-        ]
+        ],
     ];
-    initMockGoogleApi(undefined, { data: { values: games } }, undefined, { data: { values: events } });
-    const error = new Error("ERROR C!");
-    jest.spyOn(fs, "writeFileSync").mockImplementation(() => {
+    initMockGoogleApi(undefined, { data: { values: games } }, undefined, {
+        data: { values: events },
+    });
+    const error = new Error('ERROR C!');
+    jest.spyOn(fs, 'writeFileSync').mockImplementation(() => {
         throw error;
     });
 
     print();
 
     assertAbsentFile(resultFile);
-    expect(consoleErrorOutput).toMatchObject(["Error writing file:", error]);
+    expect(consoleErrorOutput).toMatchObject(['Error writing file:', error]);
     expect(consoleLogOutput).toMatchObject([]);
 });
 
 test('Generate ; no credentials', () => {
     generate();
 
-    expect(consoleErrorOutput).toMatchObject(['Error parsing client secret file']);
+    expect(consoleErrorOutput).toMatchObject([
+        'Error parsing client secret file',
+    ]);
     expect(consoleLogOutput).toMatchObject([]);
 });
 
 test('Generate ; wrong credentials format', () => {
-    originalWriteFileSync(credentialsFile, "foo");
+    originalWriteFileSync(credentialsFile, 'foo');
 
     generate();
 
-    expect(consoleErrorOutput).toMatchObject(['Error parsing client secret file']);
+    expect(consoleErrorOutput).toMatchObject([
+        'Error parsing client secret file',
+    ]);
     expect(consoleLogOutput).toMatchObject([]);
 });
 
 test('Generate ; no token', () => {
-    originalWriteFileSync(credentialsFile, JSON.stringify({ installed: { client_secret: 'secret', client_id: 'id', redirect_uris: [''] } }));
+    originalWriteFileSync(
+        credentialsFile,
+        JSON.stringify({
+            installed: {
+                client_secret: 'secret',
+                client_id: 'id',
+                redirect_uris: [''],
+            },
+        })
+    );
 
     generate();
 
     expect(consoleErrorOutput).toMatchObject(['Error reading token file']);
-    expect(consoleLogOutput).toMatchObject(["Authorize this app by visiting this url:"]);
+    expect(consoleLogOutput).toMatchObject([
+        'Authorize this app by visiting this url:',
+    ]);
 
     const rl = readline.createInterface({
-        input: process.stdin
+        input: process.stdin,
     });
-    rl.write("foo");
+    rl.write('foo');
     rl.close();
 });
 
 test('Generate ; wrong token format', () => {
-    originalWriteFileSync(credentialsFile, JSON.stringify({ installed: { client_secret: 'secret', client_id: 'id', redirect_uris: [''] } }));
-    originalWriteFileSync(tokenFile, "foo")
+    originalWriteFileSync(
+        credentialsFile,
+        JSON.stringify({
+            installed: {
+                client_secret: 'secret',
+                client_id: 'id',
+                redirect_uris: [''],
+            },
+        })
+    );
+    originalWriteFileSync(tokenFile, 'foo');
 
     generate();
 
@@ -290,8 +312,17 @@ test('Generate ; wrong token format', () => {
 });
 
 test('Generate ; error', () => {
-    originalWriteFileSync(credentialsFile, JSON.stringify({ installed: { client_secret: 'secret', client_id: 'id', redirect_uris: [''] } }));
-    originalWriteFileSync(tokenFile, "{}")
+    originalWriteFileSync(
+        credentialsFile,
+        JSON.stringify({
+            installed: {
+                client_secret: 'secret',
+                client_id: 'id',
+                redirect_uris: [''],
+            },
+        })
+    );
+    originalWriteFileSync(tokenFile, '{}');
 
     generate();
 
@@ -300,31 +331,50 @@ test('Generate ; error', () => {
 });
 
 test('Generate ; check call print', () => {
-    originalWriteFileSync(credentialsFile, JSON.stringify({ installed: { client_secret: 'secret', client_id: 'id', redirect_uris: [''] } }));
-    originalWriteFileSync(tokenFile, "{}")
+    originalWriteFileSync(
+        credentialsFile,
+        JSON.stringify({
+            installed: {
+                client_secret: 'secret',
+                client_id: 'id',
+                redirect_uris: [''],
+            },
+        })
+    );
+    originalWriteFileSync(tokenFile, '{}');
 
     initMockGoogleApi('Error D');
 
     generate();
 
-    expect(consoleErrorOutput).toMatchObject(['The API returned an error (get screenshots):', "Error D"]);
+    expect(consoleErrorOutput).toMatchObject([
+        'The API returned an error (get screenshots):',
+        'Error D',
+    ]);
     expect(consoleLogOutput).toMatchObject([]);
 });
 
-function initMockGoogleApi(errorScreenshots, resScreenshots, errorEvents, resEvents) {
+function initMockGoogleApi(
+    errorScreenshots,
+    resScreenshots,
+    errorEvents,
+    resEvents
+) {
     process.env.DEBUG = true;
 
     class MockSheetsValues {
-        get() { /* Do nothing */ }
+        get() {
+            /* Do nothing */
+        }
     }
-    const mockSheetsValues = new MockSheetsValues()
-    const mockedGoogleSheets = { spreadsheets: { values: mockSheetsValues } }
-    jest.spyOn(google, "sheets").mockImplementation(() => mockedGoogleSheets);
-    jest.spyOn(mockSheetsValues, "get").mockImplementation((arg1, arg2) => {
+    const mockSheetsValues = new MockSheetsValues();
+    const mockedGoogleSheets = { spreadsheets: { values: mockSheetsValues } };
+    jest.spyOn(google, 'sheets').mockImplementation(() => mockedGoogleSheets);
+    jest.spyOn(mockSheetsValues, 'get').mockImplementation((arg1, arg2) => {
         if (arg1.range.match(/.+screenshots.+/)) {
-            arg2(errorScreenshots, resScreenshots)
+            arg2(errorScreenshots, resScreenshots);
         } else {
-            arg2(errorEvents, resEvents)
+            arg2(errorEvents, resEvents);
         }
     });
 }
@@ -333,7 +383,7 @@ function assertDeleteFile(file) {
     if (fs.existsSync(file)) {
         fs.unlinkSync(file);
     }
-    assertAbsentFile(file)
+    assertAbsentFile(file);
 }
 
 function assertAbsentFile(file) {

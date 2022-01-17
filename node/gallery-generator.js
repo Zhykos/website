@@ -221,35 +221,50 @@ function getNewToken(oAuth2Client, callback) {
  */
 function print(auth) {
     const sheets = google.sheets({ version: 'v4', auth });
-    sheets.spreadsheets.values.get({
+    sheets.spreadsheets.values.get(
+        {
             spreadsheetId: '1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU',
             range: "Zhykos'screenshots!A4:G",
         },
         (errScreenshots, resScreenshots) => {
             if (errScreenshots) {
-                return logErrorIfDebug('The API returned an error (get screenshots)', errScreenshots)
+                return logErrorIfDebug(
+                    'The API returned an error (get screenshots)',
+                    errScreenshots
+                );
             }
             const rowsScreenshots = resScreenshots.data.values;
             if (rowsScreenshots.length) {
                 sortArray(rowsScreenshots);
 
-                sheets.spreadsheets.values.get({
-                        spreadsheetId: '1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU',
+                sheets.spreadsheets.values.get(
+                    {
+                        spreadsheetId:
+                            '1qRqKggPFYto2UyAYh8U66Z9pnXpmwbmwHkfwsMZrLZU',
                         range: 'Events!A4:E',
                     },
                     (errEvents, resEvents) => {
                         if (errEvents) {
-                            return logErrorIfDebug('The API returned an error (get events)', errEvents)
+                            return logErrorIfDebug(
+                                'The API returned an error (get events)',
+                                errEvents
+                            );
                         }
                         const rowsEvents = resEvents.data.values;
                         if (rowsEvents.length) {
                             sortArray(rowsEvents);
                             const page = printPage(rowsScreenshots, rowsEvents);
                             try {
-                                fs.writeFileSync('../video-game-gallery.html', page);
+                                fs.writeFileSync(
+                                    '../video-game-gallery.html',
+                                    page
+                                );
                                 console.log('Fichier écrit.');
                             } catch (err) {
-                                return logErrorIfDebug('Error writing file', err)
+                                return logErrorIfDebug(
+                                    'Error writing file',
+                                    err
+                                );
                             }
                         } else {
                             console.error('Events: no data found.');
@@ -265,7 +280,7 @@ function print(auth) {
 exports.print = print;
 
 function sortArray(array) {
-    array.sort(function(obj1, obj2) {
+    array.sort(function (obj1, obj2) {
         if (obj1[0] < obj2[0]) {
             return -1;
         }
