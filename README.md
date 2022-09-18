@@ -3,4 +3,4 @@
 
 👉 www.zhykos.fr 👈
 
-Repo move to https://gitlab.com/zhykos/website
+Repo moved to https://gitlab.com/zhykos/website
